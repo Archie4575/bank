@@ -9,6 +9,7 @@ LinkedList* createLinkedList() {
     list->pHead = NULL;
     list->pTail = NULL;
     list->length = 0;
+    pthread_mutex_init(&list->lock, NULL);
 
     return list;
 }
@@ -114,5 +115,6 @@ void freeLinkedList(LinkedList* list, listFunc func) {
         list->length -= 1;
         list->pHead = pointer;
     }
+    pthread_mutex_destroy(&list->lock);
     free(list);
 }

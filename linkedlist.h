@@ -1,5 +1,6 @@
 #ifndef LINKEDLIST_H
 #define LINKEDLIST_H
+#include <pthread.h>
 
 typedef struct LinkedListNode {
     void* pData;
@@ -10,6 +11,7 @@ typedef struct LinkedList {
     LinkedListNode* pHead;
     LinkedListNode* pTail; 
     int length;
+    pthread_mutex_t lock;
 } LinkedList;
 
 typedef void (*listFunc)(void* data);
