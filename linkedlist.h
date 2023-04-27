@@ -11,7 +11,6 @@ typedef struct LinkedList {
     LinkedListNode* pHead;
     LinkedListNode* pTail; 
     int length;
-    pthread_mutex_t lock;
 } LinkedList;
 
 typedef void (*listFunc)(void* data);

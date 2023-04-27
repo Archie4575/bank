@@ -17,15 +17,15 @@ void print_customer(void* customer) {
 	return;
 }
 
-int customer_push(LinkedList* c_queue, customer_t* customer) {
+int customer_push(Queue* c_queue, customer_t* customer) {
 	int success = FALSE;
 	printf("Trying to push customer ");
 	print_customer(customer);
 	
 	pthread_mutex_lock(&c_queue->lock);
-	if (c_queue->length < M) {
-		insertLast(c_queue, customer);
-		printLinkedList(c_queue, print_customer);
+	if (c_queue->list->length < M) {
+		insertLast(c_queue->list, customer);
+		printLinkedList(c_queue->list, print_customer);
 		success = TRUE;
 	}
 
@@ -34,8 +34,8 @@ int customer_push(LinkedList* c_queue, customer_t* customer) {
 }
 
 
-void* customer(void* arg) {
-	LinkedList* c_queue = (LinkedList*) arg;
+void* customer(void* q) {
+	Queue* c_queue = (Queue*) q;
 	FILE* file = fopen(C_FILE, "r");
 	customer_t* customer = NULL;
 	int push_sucess = TRUE;
@@ -55,8 +55,8 @@ void* customer(void* arg) {
 		}
 	}
 
-	printLinkedList(c_queue, &print_customer);
+	printLinkedList(c_queue->list, &print_customer);
 
-	freeLinkedList(c_queue, &free);
+	freeQueue(c_queue, &free);
 	return NULL;
 }
