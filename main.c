@@ -4,7 +4,13 @@
 #include <pthread.h>
 #include "linkedlist.h"
 
+#define TRUE 1
+#define FALSE !TRUE
 #define C_FILE "c_file.txt"
+#define M 3
+#define TC 2
+
+pthread_mutex_t c_queue_lock;
 
 /* Customer Code */
 typedef struct {
@@ -25,10 +31,28 @@ void print_customer(void* customer) {
 	return;
 }
 
+int customer_push(LinkedList* c_queue, customer_t* customer) {
+	int success = FALSE;
+	printf("Trying to push customer ");
+	print_customer(customer);
+	
+	pthread_mutex_lock(&c_queue_lock);
+	if (c_queue->length < M) {
+		insertLast(c_queue, customer);
+		printLinkedList(c_queue, print_customer);
+		success = TRUE;
+	}
+
+	pthread_mutex_unlock(&c_queue_lock);
+	return success;
+}
+
+
 void* customer(void* queue) {
 	LinkedList* c_queue = (LinkedList*) queue;
 	FILE* file = fopen(C_FILE, "r");
 	customer_t* customer = NULL;
+	int push_sucess = TRUE;
 
 	if (file == NULL ) {
 		perror("Error reading file.");
@@ -36,7 +60,12 @@ void* customer(void* queue) {
 		while(!feof(file)) {
 			customer = create_customer();
 			fscanf(file, "%i %c", &customer->n, &customer->type);
-			insertLast(c_queue, customer);
+			sleep(TC);
+			push_sucess = customer_push(c_queue, customer);
+			while(!push_sucess) {
+                sleep(TC);
+				push_sucess = customer_push(c_queue, customer);
+			}
 		}
 	}
 
@@ -58,10 +87,14 @@ int main (int argc, char** argv) {
 	LinkedList* c_queue = createLinkedList();
 
 	pthread_t customer_th;
+
+	pthread_mutex_init(&c_queue_lock, NULL);
+
 	pthread_create(&customer_th, NULL, &customer, c_queue);
 
-
 	pthread_join(customer_th, NULL);
+
+	pthread_mutex_destroy(&c_queue_lock);
 
 	return 0;
 }
