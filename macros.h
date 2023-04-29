@@ -3,5 +3,5 @@
 
 #define C_FILE "c_file.txt"
 
-#define M 3
-#define TC 2
+#define M 10
+#define TC 0.1

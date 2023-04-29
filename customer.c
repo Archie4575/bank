@@ -6,6 +6,7 @@
 
 customer_t* create_customer() {
 	customer_t* customer = (customer_t*) malloc(sizeof(customer_t));
+	printf("Created customer at %p\n", (void*)customer);
 	customer->n = 0;
 	customer->type = ' ';
 	return customer;
@@ -24,7 +25,7 @@ int customer_push(Queue* c_queue, customer_t* customer) {
 	
 	pthread_mutex_lock(&c_queue->lock);
 	if (c_queue->list->length < M) {
-		insertLast(c_queue->list, customer);
+		insertStart(c_queue->list, customer);
 		printLinkedList(c_queue->list, print_customer);
 		success = TRUE;
 	}
@@ -45,7 +46,7 @@ void* customer(void* q) {
 	} else {
 		while(!feof(file)) {
 			customer = create_customer();
-			fscanf(file, "%i %c", &customer->n, &customer->type);
+			fscanf(file, "%i %c ", &customer->n, &customer->type);
 			sleep(TC);
 			push_sucess = customer_push(c_queue, customer);
 			while(!push_sucess) {
@@ -55,8 +56,5 @@ void* customer(void* q) {
 		}
 	}
 
-	printLinkedList(c_queue->list, &print_customer);
-
-	freeQueue(c_queue, &free);
 	return NULL;
 }

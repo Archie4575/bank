@@ -77,19 +77,26 @@ void insertLast(LinkedList* list, void* entry) {
 
 void* removeLast(LinkedList* list) {
     /* Frees the last node and returns its data */
-    void* data = list->pTail->pData;
-    LinkedListNode* pointer = list->pHead;
-    while (pointer->pNext->pNext != NULL) {
-        pointer = pointer->pNext;
+    if (list->length == 0) {
+        return NULL;
+    } else if (list->length == 1) {
+        return removeStart(list);
+    } else {
+        void* data = list->pTail->pData;
+        LinkedListNode* pointer = list->pHead;
+
+        while (pointer->pNext->pNext != NULL) {
+            pointer = pointer->pNext;
+        }
+
+        free(list->pTail);
+
+        list->pTail = pointer;
+        list->pTail->pNext = NULL;
+        list->length -= 1;
+        
+        return data;
     }
-
-    free(list->pTail);
-
-    list->pTail = pointer;
-    list->pTail->pNext = NULL;
-    list->length -= 1;
-
-    return data;
 }
 
 void printLinkedList(LinkedList* list, listFunc func) {
