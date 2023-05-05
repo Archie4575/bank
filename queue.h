@@ -7,6 +7,7 @@
 typedef struct {
     LinkedList* list;
     pthread_mutex_t lock;
+    pthread_cond_t cond_nonempty;
 } Queue;
 
 Queue* createQueue();

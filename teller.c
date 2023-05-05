@@ -1,14 +1,13 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <pthread.h>
 #include "teller.h"
 #include "macros.h"
 #include "queue.h"
 
 
 void teller_serve(customer_t* customer) {
-    printf("T: customer %p", (void*)customer);
+    printf("T: customer %p", (void*) customer);
     switch (customer->type) {
         case 'W':
             printf("T: Customer #%i wants to withdraw money.\n", customer->n);
@@ -32,7 +31,8 @@ void teller_serve(customer_t* customer) {
 }
 
 void* teller(void* arg) {
-    Queue* c_queue = (Queue*) arg;
+    teller_args* targs = (teller_args*) arg;
+    Queue* c_queue = targs->c_queue;
     while (TRUE) {
         pthread_mutex_lock(&c_queue->lock);
         if (c_queue->list->length > 0) {
