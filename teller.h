@@ -5,6 +5,7 @@
 #include "customer.h"
 
 void* teller (void* arg);
-void teller_serve(Parameters* params, customer_t* customer);
+void teller_serve(Parameters* params, int teller_id, customer_t* customer);
+void increment_tallies(Parameters* params, int teller_id);
 
 #endif

@@ -16,7 +16,7 @@ void* customer(void* arg) {
 	FILE* file = fopen(C_FILE, "r");
 
 	if (file == NULL ) {
-		perror("Error reading file.");
+		perror("Error reading file.\n");
 	} else {
 		while(!feof(file)) {
 			/* For every line in the file, read into a Customer struct */
@@ -56,9 +56,10 @@ void* customer(void* arg) {
 
 customer_t* create_customer() {
 	customer_t* customer = (customer_t*) malloc(sizeof(customer_t));
-	printf("Created customer at %p\n", (void*)customer);
+	
 	customer->n = 0;
 	customer->type = ' ';
+
 	return customer;
 }
 
