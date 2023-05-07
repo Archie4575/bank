@@ -27,6 +27,9 @@ int main (int argc, char** argv) {
 	pthread_t customer_th;
 	pthread_t teller_th[4];
 	int i;
+	char timestr[9];
+	getlocaltime(timestr);
+
 
 	/* Create threads */
 	pthread_create(&customer_th, NULL, &customer, &params);

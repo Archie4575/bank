@@ -31,5 +31,6 @@ typedef struct {
     LogFile* logfile;
 } Parameters;
 
+void getlocaltime(char * timestr);
 
 #endif

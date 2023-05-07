@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <time.h>
 #include "macros.h"
 #include "params.h"
 #include "customer.h"
@@ -12,8 +11,8 @@ void* customer(void* arg) {
 	Queue* queue = params->queue;
 	customer_t* customer = NULL;
 	int push_sucess = FALSE;
-	const char* linebreak = "-----------------------------------------------------------------------";
-	time_t localtime;
+	/* const char* linebreak = "-----------------------------------------------------------------------"; */
+	char timestr[9];
 
 	/* Open customer file */
 	FILE* file = fopen(C_FILE, "r");
@@ -38,9 +37,9 @@ void* customer(void* arg) {
 					push_sucess = TRUE;
 
 					pthread_mutex_lock(&params->logfile->lock);
-					time(&localtime);
-					fprintf(params->logfile->fd, "%s\n#%i: %c\nArrival time: %s\n%s",
-						linebreak, customer->n, customer->type, ctime(&localtime), linebreak);
+					getlocaltime(timestr);
+					/* fprintf(params->logfile->fd, "%s\n#%i: %c\nArrival time: %s\n%s",
+						linebreak, customer->n, customer->type, timestr, linebreak);*/
 					printLinkedList(queue->list, print_customer);
 					pthread_mutex_unlock(&params->logfile->lock);
 

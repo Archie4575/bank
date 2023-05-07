@@ -1,5 +1,6 @@
 #include <pthread.h>
 #include <stdlib.h>
+#include <time.h>
 #include "params.h"
 
 TellerTotals* initTellerTotals() {
@@ -23,7 +24,8 @@ void freeTellerTotals(TellerTotals* totals) {
 
 LogFile* openLogFile(char* filename) {
     LogFile* logfile = (LogFile*) malloc(sizeof(LogFile));
-    logfile->fd = fopen(filename, "r+");
+    freopen(filename, "w+", &logfile->fd);
+    setbuf(logfile->fd, NULL);
     
     pthread_mutex_init(&logfile->lock, NULL);
 
@@ -36,4 +38,11 @@ void closeLogFile(LogFile* logfile) {
     pthread_mutex_destroy(&logfile->lock);
 
     free(logfile);
+}
+
+void getlocaltime(char* timestr) {
+    time_t epochtime = time(NULL);
+    struct tm local; 
+    localtime_r(&epochtime, &local);
+    snprintf(timestr, 9, "%02d:%02d:%02d", local.tm_hour, local.tm_min, local.tm_sec);
 }
