@@ -40,7 +40,7 @@ void* customer(void* arg) {
 					pthread_mutex_lock(&params->logfile->lock);
 					time(&localtime);
 					fprintf(params->logfile->fd, "%s\n#%i: %c\nArrival time: %s\n%s",
-						linebreak, customer->n, customer->type, ctime(), linebreak);
+						linebreak, customer->n, customer->type, ctime(&localtime), linebreak);
 					pthread_mutex_unlock(&params->logfile->lock);
 
 					/* Unblock a teller to serve the customer by signalling */
