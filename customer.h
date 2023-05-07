@@ -1,10 +1,14 @@
 #ifndef CUSTOMER_H
 #define CUSTOMER_H
 #include "queue.h"
+#include <time.h>
 
 typedef struct {
     int n;
     char type;
+    struct tm arrival;
+    struct tm response;
+    struct tm finish;
 } customer_t;
 
 customer_t* create_customer();

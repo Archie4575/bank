@@ -24,7 +24,7 @@ void freeTellerTotals(TellerTotals* totals) {
 
 LogFile* openLogFile(char* filename) {
     LogFile* logfile = (LogFile*) malloc(sizeof(LogFile));
-    freopen(filename, "w+", &logfile->fd);
+    logfile->fd = fopen(filename, "w+");
     setbuf(logfile->fd, NULL);
     
     pthread_mutex_init(&logfile->lock, NULL);

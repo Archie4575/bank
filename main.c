@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <unistd.h>
 #include <pthread.h>
 #include "params.h"
 #include "macros.h"
@@ -12,7 +11,12 @@ int main (int argc, char** argv) {
 		perror("Wrong number of arguments");
 		return 1;
 	}
+
+	/* Create a queue, a teller-totals struct, a logfile */
 	Queue* queue = createQueue();
+	TellerTotals* totals = initTellerTotals();
+	LogFile* logfile = openLogFile("r_log");
+	/* Get parameters */
 	Parameters params = {
 		.m = atoi(argv[1]), 
 		.tc = atoi(argv[2]),
@@ -20,16 +24,13 @@ int main (int argc, char** argv) {
 		.td = atoi(argv[4]),
 		.ti = atoi(argv[5]),
 		.queue = queue, 
-		.totals = initTellerTotals(),
-		.logfile = openLogFile("r_log")
+		.totals = totals,
+		.logfile = logfile
 	};
 
 	pthread_t customer_th;
 	pthread_t teller_th[4];
 	int i;
-	char timestr[9];
-	getlocaltime(timestr);
-
 
 	/* Create threads */
 	pthread_create(&customer_th, NULL, &customer, &params);
@@ -43,6 +44,7 @@ int main (int argc, char** argv) {
 		pthread_join(teller_th[i], NULL);
 	}
 
+	/* Free memory */
 	freeQueue(queue, &free);
 	freeTellerTotals(params.totals);
 	closeLogFile(params.logfile);

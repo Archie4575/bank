@@ -11,8 +11,8 @@ void* customer(void* arg) {
 	Queue* queue = params->queue;
 	customer_t* customer = NULL;
 	int push_sucess = FALSE;
-	/* const char* linebreak = "-----------------------------------------------------------------------"; */
-	char timestr[9];
+	const char* linebreak = "-----------------------------------------------------------------------\n";
+	time_t ltime;
 
 	/* Open customer file */
 	FILE* file = fopen(C_FILE, "r");
@@ -34,24 +34,29 @@ void* customer(void* arg) {
 			while (!push_sucess) {
 				if (queue->list->length < params->m) { /* Check Queue has room for one more */
 					insertStart(queue->list, customer);
+					ltime = time(NULL);
+					localtime_r(&ltime, &customer->arrival);
 					push_sucess = TRUE;
 
+					/* Print arrival time string to logfile */
 					pthread_mutex_lock(&params->logfile->lock);
-					getlocaltime(timestr);
-					/* fprintf(params->logfile->fd, "%s\n#%i: %c\nArrival time: %s\n%s",
-						linebreak, customer->n, customer->type, timestr, linebreak);*/
-					printLinkedList(queue->list, print_customer);
+					fprintf(params->logfile->fd, "%s%i: %c\nArrival time: %02d:%02d:%02d\n%s",
+						linebreak,
+						customer->n, customer->type,
+						customer->arrival.tm_hour, customer->arrival.tm_min, customer->arrival.tm_sec,
+						linebreak);
+					fflush(params->logfile->fd);
 					pthread_mutex_unlock(&params->logfile->lock);
-
-					/* Unblock a teller to serve the customer by signalling */
-					pthread_cond_signal(&queue->new_customer);
-
 				} else {
 					/* Block thread if there is no space */
 					pthread_cond_wait(&queue->not_full, &queue->lock);
 				}
 			}
 			pthread_mutex_unlock(&queue->lock);
+
+			/* Unblock a teller to serve the customer by signalling */
+			pthread_cond_signal(&queue->new_customer);
+
 		}
 		/* End of file, no more incoming customer */
 		pthread_mutex_lock(&queue->lock);
