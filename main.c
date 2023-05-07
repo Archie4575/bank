@@ -13,7 +13,7 @@ int main (int argc, char** argv) {
 	}
 
 	/* Create a queue, a teller-totals struct, a logfile */
-	Queue* queue = createQueue();
+	Queue* c_queue = createQueue();
 	TellerTotals* totals = initTellerTotals();
 	LogFile* logfile = openLogFile("r_log");
 	/* Get parameters */
@@ -23,7 +23,7 @@ int main (int argc, char** argv) {
 		.tw = atoi(argv[3]),
 		.td = atoi(argv[4]),
 		.ti = atoi(argv[5]),
-		.queue = queue, 
+		.queue = c_queue, 
 		.totals = totals,
 		.logfile = logfile
 	};
@@ -33,6 +33,7 @@ int main (int argc, char** argv) {
 	int i;
 
 	/* Create threads */
+	printf("Starting threads...\n");
 	pthread_create(&customer_th, NULL, &customer, &params);
 	for (i=0; i<4; i++) {
 		pthread_create(&teller_th[i], NULL, &teller, &params);
@@ -43,9 +44,10 @@ int main (int argc, char** argv) {
 	for (i=0; i<4; i++) {
 		pthread_join(teller_th[i], NULL);
 	}
+	printf("Threads joined...\n");
 
 	/* Free memory */
-	freeQueue(queue, &free);
+	freeQueue(c_queue, &free);
 	freeTellerTotals(params.totals);
 	closeLogFile(params.logfile);
 	return 0;
