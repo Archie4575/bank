@@ -20,4 +20,6 @@ void freeQueue(Queue* q, listFunc func) {
     pthread_mutex_destroy(&q->lock);
     pthread_cond_destroy(&q->not_full);
     pthread_cond_destroy(&q->new_customer);
+    
+    free(q);
 }
