@@ -41,12 +41,12 @@ void* customer(void* arg) {
 					time(&localtime);
 					fprintf(params->logfile->fd, "%s\n#%i: %c\nArrival time: %s\n%s",
 						linebreak, customer->n, customer->type, ctime(&localtime), linebreak);
+					printLinkedList(queue->list, print_customer);
 					pthread_mutex_unlock(&params->logfile->lock);
 
 					/* Unblock a teller to serve the customer by signalling */
 					pthread_cond_signal(&queue->new_customer);
 
-					printLinkedList(queue->list, print_customer);
 				} else {
 					/* Block thread if there is no space */
 					pthread_cond_wait(&queue->not_full, &queue->lock);
@@ -60,6 +60,7 @@ void* customer(void* arg) {
 		pthread_mutex_unlock(&queue->lock);
 	}
 
+	fclose(file);
 	return NULL;
 }
 

@@ -26,11 +26,10 @@ void* teller(void* arg) {
     }
     
     pthread_mutex_lock(&queue->lock);
-    while (TRUE) {
+    while (queue->incoming) {
         /* If no customers in queue, block */
-        if (queue->list->length <= 0) {
-            pthread_cond_wait(&queue->new_customer, &queue->lock);
-        }
+        pthread_cond_wait(&queue->new_customer, &queue->lock);
+        if (!queue->incoming) break;
         /* Pop last customer from queue and signal not_full */
         customer_t* customer = (customer_t*) removeLast(queue->list);
         pthread_cond_signal(&queue->not_full);
@@ -44,10 +43,9 @@ void* teller(void* arg) {
         /* Update total customers served */
         increment_tallies(params, teller_id);
 
-        /* Terminate if there are no more incoming customers */
-        pthread_mutex_lock(&queue->lock);
-        if (!queue->incoming) break;
     }
+    /* Terminate if there are no more incoming customers */
+    pthread_cond_signal(&queue->new_customer); /* Unblock other tellers */
     pthread_mutex_unlock(&queue->lock);
 
     pthread_mutex_lock(&params->queue->lock);
