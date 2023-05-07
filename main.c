@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <pthread.h>
 #include "params.h"
-#include "macros.h"
 #include "customer.h"
 #include "teller.h"
 
