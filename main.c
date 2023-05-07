@@ -8,15 +8,20 @@
 #include "teller.h"
 
 int main (int argc, char** argv) {
+	if (argc != 6) {
+		perror("Wrong number of arguments");
+		return 1;
+	}
 	Queue* queue = createQueue();
 	Parameters params = {
-		.queue = queue, 
 		.m = atoi(argv[1]), 
 		.tc = atoi(argv[2]),
 		.tw = atoi(argv[3]),
 		.td = atoi(argv[4]),
 		.ti = atoi(argv[5]),
-		.totals = initTellerTotals()
+		.queue = queue, 
+		.totals = initTellerTotals(),
+		.logfile = openLogFile("r_log")
 	};
 
 	pthread_t customer_th;
@@ -37,6 +42,7 @@ int main (int argc, char** argv) {
 
 	freeQueue(queue, &free);
 	freeTellerTotals(params.totals);
+	closeLogFile(params.logfile);
 	return 0;
 }
 

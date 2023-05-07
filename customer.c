@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <time.h>
 #include "macros.h"
 #include "params.h"
 #include "customer.h"
@@ -11,6 +12,8 @@ void* customer(void* arg) {
 	Queue* queue = params->queue;
 	customer_t* customer = NULL;
 	int push_sucess = FALSE;
+	const char* linebreak = "-----------------------------------------------------------------------";
+	time_t localtime;
 
 	/* Open customer file */
 	FILE* file = fopen(C_FILE, "r");
@@ -33,6 +36,12 @@ void* customer(void* arg) {
 				if (queue->list->length < params->m) { /* Check Queue has room for one more */
 					insertStart(queue->list, customer);
 					push_sucess = TRUE;
+
+					pthread_mutex_lock(&params->logfile->lock);
+					time(&localtime);
+					fprintf(params->logfile->fd, "%s\n#%i: %c\nArrival time: %s\n%s",
+						linebreak, customer->n, customer->type, ctime(), linebreak);
+					pthread_mutex_unlock(&params->logfile->lock);
 
 					/* Unblock a teller to serve the customer by signalling */
 					pthread_cond_signal(&queue->new_customer);

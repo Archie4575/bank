@@ -10,13 +10,16 @@ void* teller(void* arg) {
     /* Thread routine to serve customers in the queue */
     Parameters* params = (Parameters*) arg;
     Queue* queue = params->queue;
-    int teller_id = 0;
+    int teller_id;
+
     pthread_mutex_lock(&params->totals->lock);
     if (params->totals->num_tellers < 4) {
+        /* Set teller_id and update number of tellers*/
         params->totals->num_tellers++;
         teller_id = params->totals->num_tellers;
         pthread_mutex_unlock(&params->totals->lock);
     } else {
+        /* Terminate if there are already four tellers */
         pthread_mutex_unlock(&params->totals->lock);
         printf("Too many tellers already.\n");
         return NULL;

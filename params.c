@@ -20,3 +20,20 @@ void freeTellerTotals(TellerTotals* totals) {
     pthread_mutex_destroy(&totals->lock);
     free(totals);
 }
+
+LogFile* openLogFile(char* filename) {
+    LogFile* logfile = (LogFile*) malloc(sizeof(LogFile));
+    logfile->fd = fopen(filename, "r+");
+    
+    pthread_mutex_init(&logfile->lock, NULL);
+
+    return logfile;
+}
+
+void closeLogFile(LogFile* logfile) {
+    fclose(logfile->fd);
+
+    pthread_mutex_destroy(&logfile->lock);
+
+    free(logfile);
+}

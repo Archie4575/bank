@@ -1,5 +1,6 @@
 #ifndef PARAMS_H
 #define PARAMS_H
+#include <stdio.h>
 #include "queue.h"
 
 typedef struct {
@@ -12,13 +13,22 @@ TellerTotals* initTellerTotals(void);
 void freeTellerTotals(TellerTotals* totals);
 
 typedef struct {
-    Queue* queue;
+    FILE* fd;
+    pthread_mutex_t lock;
+} LogFile;
+
+LogFile* openLogFile(char* filename);
+void closeLogFile(LogFile* log);
+
+typedef struct {
     const int m;
     const int tc;
     const int td;
     const int tw;
     const int ti;
+    Queue* queue;
     TellerTotals* totals;
+    LogFile* logfile;
 } Parameters;
 
 
