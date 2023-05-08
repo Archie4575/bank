@@ -1,6 +1,5 @@
 #ifndef LINKEDLIST_H
 #define LINKEDLIST_H
-#include <pthread.h>
 
 typedef struct LinkedListNode {
     void* pData;

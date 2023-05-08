@@ -16,8 +16,7 @@ typedef struct {
 customer_t* create_customer();
 void print_customer(void* customer);
 
-/* Thread functions */
-int customer_push(Queue* c_queue, customer_t* customer);
+/* Thread function */
 void* customer(void* queue);
 
 #endif

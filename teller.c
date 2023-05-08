@@ -74,7 +74,7 @@ void* teller(void* arg) {
         free(customer);
 
         /* Update total customers served */
-        increment_tallies(params, teller_id);
+        increment_tallies(params->totals, teller_id);
 
         pthread_mutex_lock(&queue->lock);
     }
@@ -114,6 +114,7 @@ void* teller(void* arg) {
 }
 
 void teller_serve(Parameters* params, int teller_id, customer_t* customer) {
+    /* Sleeps for the desired duration depending on customer type */
     switch (customer->type) {
         case 'W':
             sleep(params->tw);
@@ -129,11 +130,11 @@ void teller_serve(Parameters* params, int teller_id, customer_t* customer) {
     }
 }
 
-void increment_tallies(Parameters* params, int teller_id) {
+void increment_tallies(TellerTotals* totals, int teller_id) {
     /* Increments the teller's total customers served */
-    pthread_mutex_lock(&params->totals->lock);
+    pthread_mutex_lock(&totals->lock);
 
-    params->totals->tallies[teller_id - 1] += 1;
+    totals->tallies[teller_id - 1] += 1;
 
-    pthread_mutex_unlock(&params->totals->lock);
+    pthread_mutex_unlock(&totals->lock);
 }

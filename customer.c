@@ -60,9 +60,10 @@ void* customer(void* arg) {
 		pthread_mutex_lock(&queue->lock);
 		queue->incoming = FALSE; /* Set incoming flag to false so tellers terminate */
 		pthread_mutex_unlock(&queue->lock);
+	
+		fclose(file);
 	}
 
-	fclose(file);
 	return NULL;
 }
 
