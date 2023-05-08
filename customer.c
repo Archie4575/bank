@@ -39,14 +39,12 @@ void* customer(void* arg) {
 					push_sucess = TRUE;
 
 					/* Print arrival time string to logfile */
-					pthread_mutex_lock(&params->logfile->lock);
-					fprintf(params->logfile->fd, "%s%i: %c\nArrival time: %02d:%02d:%02d\n%s",
+					LOG(params->logfile, "%s%i: %c\nArrival time: %02d:%02d:%02d\n%s",
 						linebreak,
 						customer->n, customer->type,
 						customer->arrival.tm_hour, customer->arrival.tm_min, customer->arrival.tm_sec,
 						linebreak);
-					fflush(params->logfile->fd);
-					pthread_mutex_unlock(&params->logfile->lock);
+
 				} else {
 					/* Block thread if there is no space */
 					pthread_cond_wait(&queue->not_full, &queue->lock);
@@ -69,8 +67,10 @@ void* customer(void* arg) {
 }
 
 customer_t* create_customer() {
+	/* Constructor function */
 	customer_t* customer = (customer_t*) malloc(sizeof(customer_t));
 	
+	/* Set default values */
 	customer->n = 0;
 	customer->type = ' ';
 
@@ -78,7 +78,9 @@ customer_t* create_customer() {
 }
 
 void print_customer(void* customer) {
+	/* Standard printer function used by printLinkedList */
 	customer_t* c = (customer_t*)customer;
 	printf("#%i: '%c'\n", c->n, c->type);
+
 	return;
 }

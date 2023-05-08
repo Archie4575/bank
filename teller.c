@@ -51,14 +51,11 @@ void* teller(void* arg) {
         pthread_mutex_unlock(&queue->lock);
 
         /* Log repsonse time of customer */
-        pthread_mutex_lock(&params->logfile->lock);
-        fprintf(params->logfile->fd, "Teller: %i\nCustomer: %i\nArrival time: %02d:%02d:%02d\nResponse Time: %02d:%02d:%02d\n",
+        LOG(params->logfile, "Teller: %i\nCustomer: %i\nArrival time: %02d:%02d:%02d\nResponse Time: %02d:%02d:%02d\n",
             teller_id,
             customer->n,
             customer->arrival.tm_hour, customer->arrival.tm_min, customer->arrival.tm_sec,
             customer->response.tm_hour, customer->response.tm_min, customer->response.tm_sec);
-        fflush(params->logfile->fd);
-        pthread_mutex_unlock(&params->logfile->lock);
 
         /* Serve customer */
         teller_serve(params, teller_id, customer);
@@ -68,14 +65,11 @@ void* teller(void* arg) {
         localtime_r(&ltime, &customer->finish);
 
         /* Log finish time of customer */
-        pthread_mutex_lock(&params->logfile->lock);
-        fprintf(params->logfile->fd, "Teller: %i\nCustomer: %i\nArrival time: %02d:%02d:%02d\nFinish Time: %02d:%02d:%02d\n",
+        LOG(params->logfile, "Teller: %i\nCustomer: %i\nArrival time: %02d:%02d:%02d\nFinish Time: %02d:%02d:%02d\n",
             teller_id,
             customer->n,
             customer->arrival.tm_hour, customer->arrival.tm_min, customer->arrival.tm_sec,
             customer->finish.tm_hour, customer->finish.tm_min, customer->finish.tm_sec);
-        fflush(params->logfile->fd);
-        pthread_mutex_unlock(&params->logfile->lock);
 
         free(customer);
 
@@ -95,30 +89,23 @@ void* teller(void* arg) {
     pthread_mutex_lock(&params->totals->lock);
 
     /* Log final stats of teller */
-    pthread_mutex_lock(&params->logfile->lock);
-    fprintf(params->logfile->fd, "Termination: teller-%i\n#served customers: %i\nStart time: %02d:%02d:%02d\nFinish Time: %02d:%02d:%02d\n",
+    LOG(params->logfile, "Termination: teller-%i\n#served customers: %i\nStart time: %02d:%02d:%02d\nFinish Time: %02d:%02d:%02d\n",
         teller_id,
         params->totals->tallies[teller_id-1],
         start_time.tm_hour, start_time.tm_min, start_time.tm_sec,
         finish_time.tm_hour, finish_time.tm_min, finish_time.tm_sec);
-    fflush(params->logfile->fd);
-    pthread_mutex_unlock(&params->logfile->lock);
 
-    /* Decrement number of tellers */
     params->totals->num_tellers -= 1;
+
+    /* If last teller, log final stats of all tellers */
     if (params->totals->num_tellers == 0) {
-        /* If last teller, log final stats of all tellers */
-        pthread_mutex_lock(&params->logfile->lock);
-        fprintf(params->logfile->fd, "\nTeller Statistics\n");
+        LOG(params->logfile, "\nTeller Statistics\n");
         total_served = 0;
         for (i = 0; i<4; i++) {
-            fprintf(params->logfile->fd, "Teller-%i served %i customers.\n",
-                i+1, params->totals->tallies[i]);
+            LOG(params->logfile, "Teller-%i served %i customers.\n", i+1, params->totals->tallies[i]);
             total_served += params->totals->tallies[i];
         }
-        fprintf(params->logfile->fd, "\nTotal number of customers: %i customers.\n", total_served);
-        fflush(params->logfile->fd);
-        pthread_mutex_unlock(&params->logfile->lock);
+        LOG(params->logfile, "\nTotal number of customers: %i customers.\n", total_served);
     }
 
     pthread_mutex_unlock(&params->totals->lock);
@@ -143,7 +130,10 @@ void teller_serve(Parameters* params, int teller_id, customer_t* customer) {
 }
 
 void increment_tallies(Parameters* params, int teller_id) {
+    /* Increments the teller's total customers served */
     pthread_mutex_lock(&params->totals->lock);
+
     params->totals->tallies[teller_id - 1] += 1;
+
     pthread_mutex_unlock(&params->totals->lock);
 }

@@ -3,6 +3,7 @@
 #include "queue.h"
 #include <time.h>
 
+/* Customer data */
 typedef struct {
     int n;
     char type;
@@ -11,8 +12,11 @@ typedef struct {
     struct tm finish;
 } customer_t;
 
+/* Customer methods */
 customer_t* create_customer();
 void print_customer(void* customer);
+
+/* Thread functions */
 int customer_push(Queue* c_queue, customer_t* customer);
 void* customer(void* queue);
 
